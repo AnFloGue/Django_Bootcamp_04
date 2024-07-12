@@ -33,6 +33,7 @@ def product_create_view(request, *args, **kwargs):
     
     return render(request, "forms.html", {"form": form})
 
+
 def product_detail_view(request, pk):
     info_request_any_view(request)
     try:
@@ -58,7 +59,6 @@ def product_api_detail_view(request, pk):
     except Product.DoesNotExist:
         return JsonResponse({"message": "Not found"}, status=404)
     return JsonResponse({"id": obj.id})
-
 
 # def product_create_view(request, *args, **kwargs):
 #     if request.method == 'POST':
