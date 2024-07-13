@@ -1,12 +1,19 @@
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.shortcuts import render, redirect
-
-# Create your views here.
 from .forms import LoginForm, RegisterForm
 
-User = get_user_model()
+# Create your views here.
+
+User = get_user_model() # User = settings.AUTH_USER_MODEL
+
 
 def register_view(request):
+    """
+    A view function for user registration. It processes the registration form data, creates a new user if the form is valid, logs in the user, and redirects to the homepage. If the user creation fails, it sets a session variable 'register_error' to 1.
+
+    Parameters:
+    - request: HttpRequest object containing metadata about the request
+    """
     form = RegisterForm(request.POST or None)
     if form.is_valid():
         username = form.cleaned_data.get("username")
@@ -17,11 +24,12 @@ def register_view(request):
             user = User.objects.create_user(username, email, password)
         except:
             user = None
-        if user != None:
+        
+        if user is not None:
             login(request, user)
             return redirect("/")
         else:
-            request.session['register_error'] = 1 # 1 == True
+            request.session['register_error'] = 1  # 1 == True
     return render(request, "forms.html", {"form": form})
 
 
@@ -31,19 +39,14 @@ def login_view(request):
         username = form.cleaned_data.get("username")
         password = form.cleaned_data.get("password")
         user = authenticate(request, username=username, password=password)
-        if user != None:
-            # user is valid and active -> is_active
-            # request.user == user
+        if user is not None:
             login(request, user)
             return redirect("/")
         else:
-            # attempt = request.session.get("attempt") or 0
-            # request.session['attempt'] = attempt + 1
-            # return redirect("/invalid-password")
-            request.session['invalid_user'] = 1 # 1 == True
+            request.session['invalid_user'] = 1  # 1 == True
     return render(request, "forms.html", {"form": form})
+
 
 def logout_view(request):
     logout(request)
-    # request.user == Anon User
     return redirect("/login")

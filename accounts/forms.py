@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 
 non_allowed_usernames = ['abc']
-# check for unique email & username
+
 
 User = get_user_model()
 
@@ -60,14 +60,9 @@ class LoginForm(forms.Form):
         )
     )
     
-    # def clean(self):
-    #     data = super().clean()
-    #     username = data.get("username")
-    #     password = data.get("password")
-    
-    def clean_username(self):
+    def clean_username(self):    # here we are checking if the user exists or not
         username = self.cleaned_data.get("username")
-        qs = User.objects.filter(username__iexact=username)  # thisIsMyUsername == thisismyusername
+        qs = User.objects.filter(username__iexact=username)
         if not qs.exists():
             raise forms.ValidationError("This is an invalid user.")
         if qs.count() != 1:
